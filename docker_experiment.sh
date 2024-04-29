@@ -12,4 +12,4 @@ mkdir -p "$results_folder"
 
 docker build --build-arg REQUIREMENTS_PATH="$requirement_path" --build-arg MODULES_CSV_PATH="$modules_csv_path" -t "$experiment_name" .
 
-docker run -v $results_folder:/app/results polars-subprocess-no-plugin $@
+docker run -v $results_folder:/app/results "$experiment_name" $@
