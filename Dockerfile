@@ -28,15 +28,17 @@ RUN apt-get update && \
 
 COPY "experiment.py" "experiment.py"
 
-COPY "pynguin" "pynguin"
+COPY --chown=app:app ".git" ".git"
 
-COPY --from=environment "/app/.venv" ".venv"
+COPY --chown=app:app "pynguin" "pynguin"
+
+COPY --chown=app:app --from=environment "/app/.venv" ".venv"
 
 ENV PATH="/app/.venv/bin:$PATH"
 
 ARG MODULES_CSV_PATH
 
-COPY "$MODULES_CSV_PATH" "modules.csv"
+COPY --chown=app:app "$MODULES_CSV_PATH" "modules.csv"
 
 USER app
 
