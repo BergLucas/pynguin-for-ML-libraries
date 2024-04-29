@@ -1,0 +1,4 @@
+polars.io.csv.functions,main,False,""
+polars.io.csv.functions,improvement/grammar-based-file-like-objects,False,"--plugins pynguin.plugins.grammar_fuzzer.csv_plugin --csv_weight 25"
+polars.io.csv.functions,improvement/process-based-tests-execution,True,"--subprocess"
+polars.io.csv.functions,subprocess+plugin-system+grammar-plugin,True,"--subprocess --plugins pynguin.plugins.grammar_fuzzer.csv_plugin --csv_weight 25"

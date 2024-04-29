@@ -1,0 +1,10 @@
+name: pynguin-for-ML-libraries
+
+dependencies:
+  - python=3.10.14
+  - pip=23.3.1
+  - pip:
+    - -e ./pynguin
+
+variables:
+  PYNGUIN_DANGER_AWARE: 1
