@@ -1,0 +1,5 @@
+pandas.io.parsers.readers,main,False,""
+pandas.io.parsers.readers,improvement/remove-mutpy,False,""
+pandas.io.parsers.readers,improvement/grammar-based-file-like-objects,False,"--plugins pynguin.plugins.grammar_fuzzer.csv_plugin --csv_weight 25"
+pandas.io.parsers.readers,improvement/process-based-tests-execution,True,"--subprocess"
+pandas.io.parsers.readers,subprocess+plugin-system+grammar-plugin,True,"--subprocess --plugins pynguin.plugins.grammar_fuzzer.csv_plugin --csv_weight 25"
