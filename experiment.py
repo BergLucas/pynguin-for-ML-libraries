@@ -11,7 +11,6 @@ def run_pynguin(
     module_name: str,
     project_path: str,
     report_path: str,
-    type_tracing: bool,
     maximum_search_time: int,
     seed: int,
     create_coverage_report: bool,
@@ -42,7 +41,6 @@ def run_pynguin(
                     "--project-path", project_path,
                     "--output-path", report_path,
                     "--report-dir", report_path,
-                    "--type-tracing", str(type_tracing),
                     "--maximum-search-time", str(maximum_search_time),
                     "--seed", str(seed),
                     "--create-coverage-report", str(create_coverage_report),
@@ -103,7 +101,6 @@ def main():
     project_path = args.project_path
     results_path = args.results_path
     nb_experiments = args.nb_experiments
-    type_tracing = args.type_tracing
     maximum_search_time = args.maximum_search_time
     timeout = args.timeout
     create_coverage_report = args.create_coverage_report
@@ -141,7 +138,6 @@ def main():
                     module_name,
                     project_path,
                     report_path,
-                    type_tracing,
                     maximum_search_time,
                     seed,
                     create_coverage_report,
