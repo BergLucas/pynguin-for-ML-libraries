@@ -1,6 +1,5 @@
 import subprocess
 import os
-import re
 import random
 import argparse
 import time
@@ -15,16 +14,14 @@ def run_pynguin(
     seed: int,
     create_coverage_report: bool,
     timeout: int,
-    catch_crashes: bool,
     *pynguin_args: str,
 ):
     os.makedirs(report_path, exist_ok=True)
 
-    if catch_crashes:
-        crash_args = ["--crash-path", report_path]
-    else:
-        crash_args = []
-
+    formatted_pynguin_args = (
+        arg.format(report_path=report_path)
+        for arg in pynguin_args
+    )
 
     with open(f"{report_path}/seed", "w") as seed_file:
         seed_file.write(f"{seed}")
@@ -46,8 +43,7 @@ def run_pynguin(
                     "--create-coverage-report", str(create_coverage_report),
                     "--output-variables", "TargetModule", "AlgorithmIterations", "Coverage", "TotalTime", "SearchTime", "LineNos", "MutationScore",
                     "-v",
-                    *crash_args,
-                    *pynguin_args,
+                    *formatted_pynguin_args,
                 ],
                 stdout=stdout_file,
                 stderr=stderr_file,
@@ -79,11 +75,11 @@ def split_args(args: str) -> list[str]:
     return [arg for arg in args.split(" ") if arg]
 
 
-INVALID_FILE_CHARACTER_PATTERN = re.compile(r"[^\w_.)( -]")
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--modules-csv-path", default="modules.csv")
+    parser.add_argument("--modules-csv-start", default=None)
+    parser.add_argument("--modules-csv-end", default=None)
     parser.add_argument("--project-path", default=".")
     parser.add_argument("--pynguin-path", default="pynguin")
     parser.add_argument("--results-path", default="results")
@@ -110,12 +106,26 @@ def main():
 
     with open(modules_csv_path, "r") as modules_csv_file:
         modules = [
-            (module_name, branch_name, catch_crashes == "True", split_args(pynguin_args))
-            for module_name, branch_name, catch_crashes, pynguin_args in csv.reader(modules_csv_file)
+            (module_name, experiment_name, branch_name, split_args(pynguin_args))
+            for module_name, experiment_name, branch_name, pynguin_args in csv.reader(modules_csv_file)
         ]
 
-    for module_name, branch_name, catch_crashes, pynguin_args in modules:
-            print(f'Doing {nb_experiments} experiments with "{module_name}" on branch "{branch_name}"')
+    modules_start_string = args.modules_csv_start
+
+    if modules_start_string is None:
+        modules_start = 0
+    else:
+        modules_start = int(modules_start_string)
+
+    modules_end_string = args.modules_csv_end
+
+    if modules_end_string is None:
+        modules_end = len(modules)
+    else:
+        modules_end = int(modules_end_string)
+
+    for module_name, experiment_name, branch_name, pynguin_args in modules[modules_start:modules_end]:
+            print(f'{experiment_name} : Running {nb_experiments} experiments with "{module_name}" on branch "{branch_name}"')
 
             change_pynguin_branch(pynguin_path, branch_name)
 
@@ -123,10 +133,7 @@ def main():
 
             for i in range(nb_experiments):
                 print(f"Experiment {i}")
-                branch_dir = re.sub(INVALID_FILE_CHARACTER_PATTERN, "_", branch_name)
-                module_dir = re.sub(INVALID_FILE_CHARACTER_PATTERN, "_", module_name)
-
-                report_path = os.path.join(results_path, module_dir, branch_dir, str(i))
+                report_path = os.path.join(results_path, experiment_name, str(i))
 
                 seed = random.randrange(0, 2 << 64)
 
@@ -142,7 +149,6 @@ def main():
                     seed,
                     create_coverage_report,
                     timeout,
-                    catch_crashes,
                     *pynguin_args,
                 )
 
