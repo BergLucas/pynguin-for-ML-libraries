@@ -1,4 +1,4 @@
-pandas.io.parsers.readers,pandas_parser_main,600,1200,main,""
+pandas.io.parsers.readers,pandas_parser_main,main,600,1200,""
 pandas.io.parsers.readers,pandas_parser_main_finetuned,main,600,1200,"--skip-optional-parameter-probability 0.95"
 pandas.io.parsers.readers,pandas_parser_subprocess,improvement/process-based-tests-execution,600,1800,"--subprocess --crash-path {experiment_path}"
 pandas.io.parsers.readers,pandas_parser_subprocess_finetuned,improvement/process-based-tests-execution,600,1800,"--subprocess --crash-path {experiment_path} --skip-optional-parameter-probability 0.95"
