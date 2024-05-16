@@ -11,6 +11,6 @@ pandas.io.parsers.readers,pandas_parser_subprocess_finetuned_grammar_weights,sub
 pandas.core.frame,pandas_dataframe_main,main,600,1200,""
 pandas.core.frame,pandas_dataframe_subprocess,improvement/process-based-tests-execution,600,1800,"--subprocess --crash-path {experiment_path}"
 pandas.core.frame,pandas_dataframe_grammar,improvement/grammar-based-file-like-objects,600,1200,"--plugins pynguin.plugins.grammar_fuzzer.pandas_dataframe_plugin"
-pandas.core.frame,pandas_dataframe_grammar_weights,improvement/grammar-based-file-like-objects,600,1200,"--plugins pynguin.plugins.grammar_fuzzer.pandas_dataframe_plugin --csv_weight 1900 --csv_concrete_weight 400"
+pandas.core.frame,pandas_dataframe_grammar_weights,improvement/grammar-based-file-like-objects,600,1200,"--plugins pynguin.plugins.grammar_fuzzer.pandas_dataframe_plugin --pandas_dataframe_weight 1900 --pandas_dataframe_concrete_weight 400"
 pandas.core.frame,pandas_dataframe_subprocess_grammar,subprocess+plugin-system+grammar-plugin,600,1800,"--subprocess --crash-path {experiment_path} --plugins pynguin.plugins.grammar_fuzzer.pandas_dataframe_plugin"
-pandas.core.frame,pandas_dataframe_subprocess_grammar_weights,subprocess+plugin-system+grammar-plugin,600,1800,"--subprocess --crash-path {experiment_path} --plugins pynguin.plugins.grammar_fuzzer.pandas_dataframe_plugin --csv_weight 1900 --csv_concrete_weight 400"
+pandas.core.frame,pandas_dataframe_subprocess_grammar_weights,subprocess+plugin-system+grammar-plugin,600,1800,"--subprocess --crash-path {experiment_path} --plugins pynguin.plugins.grammar_fuzzer.pandas_dataframe_plugin --pandas_dataframe_weight 1900 --pandas_dataframe_concrete_weight 400"
