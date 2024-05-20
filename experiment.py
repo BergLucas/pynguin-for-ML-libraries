@@ -14,24 +14,22 @@ from collections import Counter
 def run_pynguin(
     module_name: str,
     project_path: str,
-    experiment_path: str,
+    run_path: str,
     maximum_search_time: int,
     timeout: int,
     seed: int,
     *pynguin_args: str,
 ) -> int | None:
-    os.makedirs(experiment_path, exist_ok=True)
+    os.makedirs(run_path, exist_ok=True)
 
-    formatted_pynguin_args = (
-        arg.format(experiment_path=experiment_path) for arg in pynguin_args
-    )
+    formatted_pynguin_args = (arg.format(run_path=run_path) for arg in pynguin_args)
 
-    with open(f"{experiment_path}/seed", "w") as seed_file:
+    with open(f"{run_path}/seed", "w") as seed_file:
         seed_file.write(f"{seed}")
 
     with (
-        open(f"{experiment_path}/stdout.log", "w") as stdout_file,
-        open(f"{experiment_path}/stderr.log", "w") as stderr_file,
+        open(f"{run_path}/stdout.log", "w") as stdout_file,
+        open(f"{run_path}/stderr.log", "w") as stderr_file,
     ):
         try:
             return_code = subprocess.run(
@@ -42,9 +40,9 @@ def run_pynguin(
                     "--project-path",
                     project_path,
                     "--output-path",
-                    experiment_path,
+                    run_path,
                     "--report-dir",
-                    experiment_path,
+                    run_path,
                     "--maximum-search-time",
                     str(maximum_search_time),
                     "--seed",
@@ -67,16 +65,14 @@ def run_pynguin(
         except subprocess.TimeoutExpired:
             return_code = None
 
-    with open(f"{experiment_path}/return_code", "w") as info_file:
+    with open(f"{run_path}/return_code", "w") as info_file:
         info_file.write(f"{return_code}")
 
     return return_code
 
 
-def run_coverage(experiment_path: str, module_path: str) -> None:
-    (test_file,) = filter(
-        lambda name: name.startswith("test_"), os.listdir(experiment_path)
-    )
+def run_coverage(run_path: str, module_path: str) -> None:
+    (test_file,) = filter(lambda name: name.startswith("test_"), os.listdir(run_path))
 
     subprocess.run(
         [
@@ -89,13 +85,13 @@ def run_coverage(experiment_path: str, module_path: str) -> None:
             "pytest",
             test_file,
         ],
-        cwd=experiment_path,
+        cwd=run_path,
         stdout=subprocess.DEVNULL,
     )
 
     subprocess.run(
         ["coverage", "json", "--pretty-print"],
-        cwd=experiment_path,
+        cwd=run_path,
         stdout=subprocess.DEVNULL,
     )
 
@@ -140,7 +136,7 @@ def main() -> None:
     parser.add_argument("--project-path", default=".")
     parser.add_argument("--pynguin-path", default="pynguin")
     parser.add_argument("--results-path", default="results")
-    parser.add_argument("--nb-experiments", type=int, default=30)
+    parser.add_argument("--nb-runs", type=int, default=30)
     parser.add_argument("--base-seed", type=int, default=time.time_ns())
 
     args = parser.parse_args()
@@ -149,7 +145,7 @@ def main() -> None:
     pynguin_path = args.pynguin_path
     project_path = args.project_path
     results_path = args.results_path
-    nb_experiments = args.nb_experiments
+    nb_runs = args.nb_runs
     base_seed = args.base_seed
 
     random.seed(base_seed)
@@ -192,33 +188,33 @@ def main() -> None:
         pynguin_args,
     ) in modules[modules_start:modules_end]:
         print(
-            f'{experiment_name} : Running {nb_experiments} experiments with "{module_name}" on branch "{branch_name}"'
+            f'{experiment_name} : Doing {nb_runs} runs with "{module_name}" on branch "{branch_name}"'
         )
 
         change_pynguin_branch(pynguin_path, branch_name)
 
         install_pynguin_dependencies(pynguin_path)
 
-        experiments_path = os.path.join(results_path, experiment_name)
+        experiment_path = os.path.join(results_path, experiment_name)
 
         module = importlib.import_module(module_name)
 
         module_path = inspect.getfile(module)
 
-        for i in range(nb_experiments):
-            print(f"Experiment {i}")
-            experiment_path = os.path.join(experiments_path, str(i))
+        for i in range(nb_runs):
+            print(f"Run {i}")
+            run_path = os.path.join(experiment_path, str(i))
 
             seed = random.randrange(0, 2 << 64)
 
-            if os.path.exists(experiment_path):
-                print("Skipping because the experiment path already exists")
+            if os.path.exists(run_path):
+                print("Skipping because the run path already exists")
                 continue
 
             return_code = run_pynguin(
                 module_name,
                 project_path,
-                experiment_path,
+                run_path,
                 maximum_search_time,
                 timeout,
                 seed,
@@ -226,7 +222,7 @@ def main() -> None:
             )
 
             if return_code == 0:
-                run_coverage(experiment_path, module_path)
+                run_coverage(run_path, module_path)
 
         print(f"{experiment_name} : Getting statistics")
 
@@ -243,14 +239,14 @@ def main() -> None:
         all_mutation_score = []
         executed_lines_counter = Counter({line: 0 for line in lines})
         return_code_counter = Counter()
-        for i in range(nb_experiments):
-            experiment_path = os.path.join(experiments_path, str(i))
+        for i in range(nb_runs):
+            run_path = os.path.join(experiment_path, str(i))
 
-            statistics_path = os.path.join(experiment_path, "statistics.csv")
+            statistics_path = os.path.join(run_path, "statistics.csv")
 
-            coverage_path = os.path.join(experiment_path, "coverage.json")
+            coverage_path = os.path.join(run_path, "coverage.json")
 
-            return_code_path = os.path.join(experiment_path, "return_code")
+            return_code_path = os.path.join(run_path, "return_code")
 
             try:
                 with open(statistics_path, "r") as f:
@@ -295,17 +291,17 @@ def main() -> None:
 
         summary = {
             "experiment_name": experiment_name,
-            "nb_experiments": nb_experiments,
-            "mean_iterations": sum(all_iterations) / nb_experiments,
-            "mean_coverage": sum(all_coverage) / nb_experiments,
-            "mean_total_time": sum(all_total_time) / nb_experiments,
-            "mean_search_time": sum(all_search_time) / nb_experiments,
-            "mean_mutation_score": sum(all_mutation_score) / nb_experiments,
+            "nb_runs": nb_runs,
+            "mean_iterations": sum(all_iterations) / nb_runs,
+            "mean_coverage": sum(all_coverage) / nb_runs,
+            "mean_total_time": sum(all_total_time) / nb_runs,
+            "mean_search_time": sum(all_search_time) / nb_runs,
+            "mean_mutation_score": sum(all_mutation_score) / nb_runs,
             "executed_lines_counter": executed_lines_counter,
             "return_code_counter": return_code_counter,
         }
 
-        summary_path = os.path.join(experiments_path, "summary.json")
+        summary_path = os.path.join(experiment_path, "summary.json")
 
         with open(summary_path, "w") as f:
             json.dump(summary, f, indent=4)

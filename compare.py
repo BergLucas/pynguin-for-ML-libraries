@@ -1,7 +1,5 @@
 import argparse
 import json
-from collections import Counter
-from pprint import pprint
 
 
 def main() -> None:
@@ -19,7 +17,7 @@ def main() -> None:
 
     keys = [
         "experiment_name",
-        "nb_experiments",
+        "nb_runs",
         "mean_coverage",
         "mean_iterations",
         "mean_total_time",
