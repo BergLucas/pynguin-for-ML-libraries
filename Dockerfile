@@ -14,7 +14,7 @@ ARG REQUIREMENTS_PATH
 
 COPY "$REQUIREMENTS_PATH" "requirements.txt"
 
-RUN /app/.venv/bin/pip install pip==23.3.1 -r "requirements.txt"
+RUN /app/.venv/bin/pip install pip==23.3.1 coverage==7.5.1 -r "requirements.txt"
 
 # Runner
 FROM base AS runner
