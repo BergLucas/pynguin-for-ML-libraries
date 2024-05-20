@@ -119,6 +119,19 @@ def split_args(args: str) -> list[str]:
     return [arg for arg in args.split(" ") if arg]
 
 
+def get_lines(node: ast.AST) -> set[int]:
+    lines: set[int] = set()
+
+    if hasattr(node, "lineno"):
+        lines.add(node.lineno)
+
+    for child in ast.iter_child_nodes(node):
+        if isinstance(child, (ast.mod, ast.stmt, ast.excepthandler, ast.match_case)):
+            lines.update(get_lines(child))
+
+    return lines
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--modules-csv-path", default="modules.csv")
@@ -221,9 +234,7 @@ def main() -> None:
 
         module_tree = ast.parse(module_source_code)
 
-        lines = {
-            node.lineno for node in ast.walk(module_tree) if hasattr(node, "lineno")
-        }
+        lines = get_lines(module_tree)
 
         all_iterations = []
         all_coverage = []
@@ -283,6 +294,7 @@ def main() -> None:
             return_code_counter[return_code] += 1
 
         summary = {
+            "experiment_name": experiment_name,
             "nb_experiments": nb_experiments,
             "mean_iterations": sum(all_iterations) / nb_experiments,
             "mean_coverage": sum(all_coverage) / nb_experiments,
