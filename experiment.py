@@ -4,6 +4,8 @@ import random
 import argparse
 import time
 import csv
+import json
+from collections import Counter
 
 
 def run_pynguin(
@@ -14,7 +16,7 @@ def run_pynguin(
     timeout: int,
     seed: int,
     *pynguin_args: str,
-):
+) -> int | None:
     os.makedirs(experiment_path, exist_ok=True)
 
     formatted_pynguin_args = (
@@ -65,8 +67,37 @@ def run_pynguin(
     with open(f"{experiment_path}/return_code", "w") as info_file:
         info_file.write(f"{return_code}")
 
+    return return_code
 
-def change_pynguin_branch(pynguin_path: str, branch_name: str):
+
+def run_coverage(experiment_path: str, module_name: str) -> None:
+    (test_file,) = filter(
+        lambda name: name.startswith("test_"), os.listdir(experiment_path)
+    )
+
+    subprocess.run(
+        [
+            "coverage",
+            "run",
+            "--branch",
+            "--source",
+            module_name,
+            "-m",
+            "pytest",
+            test_file,
+        ],
+        cwd=experiment_path,
+        stdout=subprocess.DEVNULL,
+    )
+
+    subprocess.run(
+        ["coverage", "json"],
+        cwd=experiment_path,
+        stdout=subprocess.DEVNULL,
+    )
+
+
+def change_pynguin_branch(pynguin_path: str, branch_name: str) -> None:
     subprocess.run(
         ["git", "checkout", branch_name],
         cwd=pynguin_path,
@@ -74,7 +105,7 @@ def change_pynguin_branch(pynguin_path: str, branch_name: str):
     )
 
 
-def install_pynguin_dependencies(pynguin_path: str):
+def install_pynguin_dependencies(pynguin_path: str) -> None:
     subprocess.run(
         ["pip", "install", "-e", pynguin_path],
         stdout=subprocess.DEVNULL,
@@ -85,7 +116,7 @@ def split_args(args: str) -> list[str]:
     return [arg for arg in args.split(" ") if arg]
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--modules-csv-path", default="modules.csv")
     parser.add_argument("--modules-csv-start", default=None)
@@ -152,9 +183,11 @@ def main():
 
         install_pynguin_dependencies(pynguin_path)
 
+        experiments_path = os.path.join(results_path, experiment_name)
+
         for i in range(nb_experiments):
             print(f"Experiment {i}")
-            experiment_path = os.path.join(results_path, experiment_name, str(i))
+            experiment_path = os.path.join(experiments_path, str(i))
 
             seed = random.randrange(0, 2 << 64)
 
@@ -162,7 +195,7 @@ def main():
                 print("Skipping because the experiment path already exists")
                 continue
 
-            run_pynguin(
+            return_code = run_pynguin(
                 module_name,
                 project_path,
                 experiment_path,
@@ -171,6 +204,84 @@ def main():
                 seed,
                 *pynguin_args,
             )
+
+            if return_code == 0:
+                run_coverage(experiment_path, module_name)
+
+        print(f"{experiment_name} : Getting statistics")
+
+        all_iterations = []
+        all_coverage = []
+        all_total_time = []
+        all_search_time = []
+        all_mutation_score = []
+        executed_lines_counter = Counter()
+        return_code_counter = Counter()
+        for i in range(nb_experiments):
+            experiment_path = os.path.join(experiments_path, str(i))
+
+            statistics_path = os.path.join(experiment_path, "statistics.csv")
+
+            coverage_path = os.path.join(experiment_path, "coverage.json")
+
+            return_code_path = os.path.join(experiment_path, "return_code")
+
+            try:
+                with open(statistics_path, "r") as f:
+                    (statistics,) = csv.DictReader(f)
+                    iterations = int(statistics["AlgorithmIterations"])
+                    coverage = float(statistics["Coverage"])
+                    total_time = int(statistics["TotalTime"])
+                    search_time = int(statistics["SearchTime"])
+                    mutation_score = float(statistics["MutationScore"])
+            except FileNotFoundError:
+                iterations = 0
+                coverage = 0.0
+                total_time = timeout
+                search_time = maximum_search_time
+                mutation_score = 0.0
+
+            try:
+                with open(coverage_path, "r") as f:
+                    coverage_data = json.load(f)
+
+                    (file_data,) = coverage_data["files"].values()
+
+                    executed_lines = file_data["executed_lines"]
+            except FileNotFoundError:
+                executed_lines = []
+
+            with open(return_code_path, "r") as f:
+                return_data = f.read()
+
+                if return_data.isdigit():
+                    return_code = int(return_data)
+                else:
+                    return_code = None
+
+            all_iterations.append(iterations)
+            all_coverage.append(coverage)
+            all_total_time.append(total_time)
+            all_search_time.append(search_time)
+            all_mutation_score.append(mutation_score)
+            executed_lines_counter.update(executed_lines)
+            return_code_counter[return_code] += 1
+
+        summary = {
+            "nb_experiments": nb_experiments,
+            "mean_iterations": sum(all_iterations) / nb_experiments,
+            "mean_coverage": sum(all_coverage) / nb_experiments,
+            "mean_total_time": sum(all_total_time) / nb_experiments,
+            "mean_search_time": sum(all_search_time) / nb_experiments,
+            "mean_mutation_score": sum(all_mutation_score) / nb_experiments,
+            "executed_lines_counter": executed_lines_counter,
+            "return_code_counter": return_code_counter,
+        }
+
+        summary_path = os.path.join(experiments_path, "summary.json")
+
+        with open(summary_path, "w") as f:
+            json.dump(summary, f, indent=4)
 
 
 if __name__ == "__main__":
