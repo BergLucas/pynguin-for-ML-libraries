@@ -16,6 +16,8 @@ def main() -> None:
     with open(args.second_summary, "r") as f:
         second_summary = json.load(f)
 
+    first_experiment_name = first_summary["experiment_name"]
+    second_experiment_name = second_summary["experiment_name"]
     total_nb_runs = first_summary["nb_runs"] + second_summary["nb_runs"]
 
     first_executed_lines_counter: dict = first_summary["executed_lines_counter"]
@@ -29,16 +31,18 @@ def main() -> None:
     first_count = [first_executed_lines_counter[line] for line in lines]
     second_count = [second_executed_lines_counter[line] for line in lines]
 
-    _, ax = plt.subplots()
+    fig, ax = plt.subplots()
 
-    ax.bar(lines, first_count, label=first_summary["experiment_name"])
-    ax.bar(
-        lines, second_count, label=second_summary["experiment_name"], bottom=first_count
-    )
+    ax.bar(lines, first_count, label=first_experiment_name)
+    ax.bar(lines, second_count, label=second_experiment_name, bottom=first_count)
 
     ax.set_ylim([0, total_nb_runs * 1.1])
     ax.set_xlabel("Line number")
     ax.set_ylabel(f"Number of times the line was executed by a test suite")
+
+    fig.canvas.manager.set_window_title(
+        f"Comparison between {first_experiment_name} and {second_experiment_name}"
+    )
 
     plt.xticks(rotation=90, fontsize=6)
     plt.legend()
