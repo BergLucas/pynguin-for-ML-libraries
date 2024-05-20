@@ -36,7 +36,7 @@ def main() -> None:
         lines, second_count, label=second_summary["experiment_name"], bottom=first_count
     )
 
-    plt.xticks(rotation=90)
+    plt.xticks(rotation=90, fontsize=6)
     plt.legend()
 
     plt.show()
