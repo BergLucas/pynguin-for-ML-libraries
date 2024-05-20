@@ -1,8 +1,6 @@
 import argparse
 import json
 import matplotlib.pyplot as plt
-from collections import Counter
-from pprint import pprint
 
 
 def main() -> None:
@@ -17,6 +15,10 @@ def main() -> None:
 
     with open(args.second_summary, "r") as f:
         second_summary = json.load(f)
+
+    total_nb_experiments = (
+        first_summary["nb_experiments"] + second_summary["nb_experiments"]
+    )
 
     first_executed_lines_counter: dict = first_summary["executed_lines_counter"]
     second_executed_lines_counter: dict = second_summary["executed_lines_counter"]
@@ -34,6 +36,12 @@ def main() -> None:
     ax.bar(lines, first_count, label=first_summary["experiment_name"])
     ax.bar(
         lines, second_count, label=second_summary["experiment_name"], bottom=first_count
+    )
+
+    ax.set_ylim([0, total_nb_experiments])
+    ax.set_xlabel("Line number")
+    ax.set_ylabel(
+        f"Number of times the line was executed by a test suite over {total_nb_experiments} runs"
     )
 
     plt.xticks(rotation=90, fontsize=6)
