@@ -38,9 +38,7 @@ def main() -> None:
 
     ax.set_ylim([0, total_nb_runs * 1.1])
     ax.set_xlabel("Line number")
-    ax.set_ylabel(
-        f"Number of times the line was executed by a test suite over {total_nb_runs} runs"
-    )
+    ax.set_ylabel(f"Number of times the line was executed by a test suite")
 
     plt.xticks(rotation=90, fontsize=6)
     plt.legend()
