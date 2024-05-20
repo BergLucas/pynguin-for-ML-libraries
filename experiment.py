@@ -5,6 +5,9 @@ import argparse
 import time
 import csv
 import json
+import inspect
+import importlib
+import ast
 from collections import Counter
 
 
@@ -70,7 +73,7 @@ def run_pynguin(
     return return_code
 
 
-def run_coverage(experiment_path: str, module_name: str) -> None:
+def run_coverage(experiment_path: str, module_path: str) -> None:
     (test_file,) = filter(
         lambda name: name.startswith("test_"), os.listdir(experiment_path)
     )
@@ -80,8 +83,8 @@ def run_coverage(experiment_path: str, module_name: str) -> None:
             "coverage",
             "run",
             "--branch",
-            "--source",
-            module_name,
+            "--include",
+            module_path,
             "-m",
             "pytest",
             test_file,
@@ -185,6 +188,10 @@ def main() -> None:
 
         experiments_path = os.path.join(results_path, experiment_name)
 
+        module = importlib.import_module(module_name)
+
+        module_path = inspect.getfile(module)
+
         for i in range(nb_experiments):
             print(f"Experiment {i}")
             experiment_path = os.path.join(experiments_path, str(i))
@@ -206,16 +213,24 @@ def main() -> None:
             )
 
             if return_code == 0:
-                run_coverage(experiment_path, module_name)
+                run_coverage(experiment_path, module_path)
 
         print(f"{experiment_name} : Getting statistics")
+
+        module_source_code = inspect.getsource(module)
+
+        module_tree = ast.parse(module_source_code)
+
+        lines = {
+            node.lineno for node in ast.walk(module_tree) if hasattr(node, "lineno")
+        }
 
         all_iterations = []
         all_coverage = []
         all_total_time = []
         all_search_time = []
         all_mutation_score = []
-        executed_lines_counter = Counter()
+        executed_lines_counter = Counter({line: 0 for line in lines})
         return_code_counter = Counter()
         for i in range(nb_experiments):
             experiment_path = os.path.join(experiments_path, str(i))
