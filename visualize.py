@@ -38,7 +38,7 @@ def main() -> None:
         lines, second_count, label=second_summary["experiment_name"], bottom=first_count
     )
 
-    ax.set_ylim([0, total_nb_experiments])
+    ax.set_ylim([0, total_nb_experiments * 1.1])
     ax.set_xlabel("Line number")
     ax.set_ylabel(
         f"Number of times the line was executed by a test suite over {total_nb_experiments} runs"
