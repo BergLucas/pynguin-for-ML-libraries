@@ -94,7 +94,7 @@ def run_coverage(experiment_path: str, module_path: str) -> None:
     )
 
     subprocess.run(
-        ["coverage", "json"],
+        ["coverage", "json", "--pretty-print"],
         cwd=experiment_path,
         stdout=subprocess.DEVNULL,
     )
