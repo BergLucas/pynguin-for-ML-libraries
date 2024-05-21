@@ -274,11 +274,9 @@ def main() -> None:
                 executed_lines = []
 
             with open(return_code_path, "r") as f:
-                return_data = f.read()
-
-                if return_data.isdigit():
-                    return_code = int(return_data)
-                else:
+                try:
+                    return_code = int(f.read())
+                except ValueError:
                     return_code = None
 
             all_iterations.append(iterations)
