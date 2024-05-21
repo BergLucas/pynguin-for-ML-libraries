@@ -52,10 +52,6 @@ def main() -> None:
         second_summary_value = str(second_summary[key])
         print(f"{key:<25}: {first_summary_value:<35} {second_summary_value:<35}")
 
-    nb_runs = first_summary["nb_runs"]
-
-    assert nb_runs == second_summary["nb_runs"]
-
     first_coverages = get_coverages(args.first_experiment, first_summary["nb_runs"])
     second_coverages = get_coverages(args.second_experiment, second_summary["nb_runs"])
 
