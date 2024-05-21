@@ -1,19 +1,23 @@
+import matplotlib.pyplot as plt
 import argparse
 import json
-import matplotlib.pyplot as plt
+import os
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("first_summary")
-    parser.add_argument("second_summary")
+    parser.add_argument("first_experiment")
+    parser.add_argument("second_experiment")
 
     args = parser.parse_args()
 
-    with open(args.first_summary, "r") as f:
+    first_summary_path = os.path.join(args.first_experiment, "summary.json")
+    second_summary_path = os.path.join(args.second_experiment, "summary.json")
+
+    with open(first_summary_path, "r") as f:
         first_summary = json.load(f)
 
-    with open(args.second_summary, "r") as f:
+    with open(second_summary_path, "r") as f:
         second_summary = json.load(f)
 
     first_experiment_name = first_summary["experiment_name"]
