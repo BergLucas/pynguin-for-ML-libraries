@@ -43,7 +43,7 @@ def main() -> None:
             first_distribution, second_distribution, alternative="two-sided"
         )
 
-        print(f"Line {line} Mann–Whitney U-test: {t_statistic} (pvalue: {p_value})")
+        print(f"Line {line:<4} Mann–Whitney U-test: {t_statistic} (pvalue: {p_value})")
 
 
 if __name__ == "__main__":
