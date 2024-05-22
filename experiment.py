@@ -251,11 +251,16 @@ def main() -> None:
             try:
                 with open(statistics_path, "r") as f:
                     (statistics,) = csv.DictReader(f)
-                    iterations = int(statistics["AlgorithmIterations"])
-                    coverage = float(statistics["Coverage"])
-                    total_time = int(statistics["TotalTime"])
-                    search_time = int(statistics["SearchTime"])
+
+                iterations = int(statistics["AlgorithmIterations"])
+                coverage = float(statistics["Coverage"])
+                total_time = int(statistics["TotalTime"])
+                search_time = int(statistics["SearchTime"])
+                try:
                     mutation_score = float(statistics["MutationScore"])
+                except ValueError:
+                    mutation_score = 0.0
+
             except FileNotFoundError:
                 iterations = 0
                 coverage = 0.0
