@@ -63,7 +63,7 @@ def main() -> None:
 
     experiment_names = " and ".join(all_experiment_name)
 
-    fig.canvas.manager.set_window_title(f"Comparison between {experiment_names}")
+    fig.canvas.manager.set_window_title(f"Visualization of {experiment_names}")
 
     plt.xticks(rotation=90, fontsize=6)
     plt.legend()
