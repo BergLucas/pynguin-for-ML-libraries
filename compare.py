@@ -12,10 +12,14 @@ def get_coverages(experiment_path: str, nb_runs: int) -> list[float]:
 
         statistics_path = os.path.join(run_path, "statistics.csv")
 
-        with open(statistics_path, "r") as f:
-            (statistics,) = csv.DictReader(f)
+        try:
+            with open(statistics_path, "r") as f:
+                (statistics,) = csv.DictReader(f)
             coverage = float(statistics["Coverage"])
-            coverages.append(coverage)
+        except FileNotFoundError:
+            coverage = 0.0
+
+        coverages.append(coverage)
 
     return coverages
 
