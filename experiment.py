@@ -125,6 +125,10 @@ def get_lines(node: ast.AST) -> set[int]:
         if isinstance(child, (ast.mod, ast.stmt, ast.excepthandler, ast.match_case)):
             lines.update(get_lines(child))
 
+    if isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)):
+        for decorator in node.decorator_list:
+            lines.update(get_lines(decorator))
+
     return lines
 
 
