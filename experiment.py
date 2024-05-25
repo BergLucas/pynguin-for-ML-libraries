@@ -244,6 +244,7 @@ def main() -> None:
         all_total_time = []
         all_search_time = []
         all_mutation_score = []
+        crash_test_count = 0
         executed_lines_counter = Counter({line: 0 for line in lines})
         return_code_counter = Counter()
         for i in range(nb_runs):
@@ -254,6 +255,15 @@ def main() -> None:
             coverage_path = os.path.join(run_path, "coverage.json")
 
             return_code_path = os.path.join(run_path, "return_code")
+
+            crash_test_count += len(
+                tuple(
+                    filter(
+                        lambda filename: filename.startswith("crash_test_"),
+                        os.listdir(run_path),
+                    )
+                )
+            )
 
             try:
                 with open(statistics_path, "r") as f:
@@ -305,8 +315,10 @@ def main() -> None:
             "mean_iterations": sum(all_iterations) / nb_runs,
             "mean_coverage": sum(all_coverage) / nb_runs,
             "mean_total_time": sum(all_total_time) / (nb_runs * NANOSECONDS_IN_SECOND),
-            "mean_search_time": sum(all_search_time) / (nb_runs * NANOSECONDS_IN_SECOND),
+            "mean_search_time": sum(all_search_time)
+            / (nb_runs * NANOSECONDS_IN_SECOND),
             "mean_mutation_score": sum(all_mutation_score) / nb_runs,
+            "crash_test_count": crash_test_count,
             "executed_lines_counter": executed_lines_counter,
             "return_code_counter": return_code_counter,
         }
