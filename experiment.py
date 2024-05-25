@@ -11,6 +11,9 @@ import ast
 from collections import Counter
 
 
+NANOSECONDS_IN_SECOND = 1_000_000_000
+
+
 def run_pynguin(
     module_name: str,
     project_path: str,
@@ -301,8 +304,8 @@ def main() -> None:
             "nb_runs": nb_runs,
             "mean_iterations": sum(all_iterations) / nb_runs,
             "mean_coverage": sum(all_coverage) / nb_runs,
-            "mean_total_time": sum(all_total_time) / nb_runs,
-            "mean_search_time": sum(all_search_time) / nb_runs,
+            "mean_total_time": sum(all_total_time) / (nb_runs * NANOSECONDS_IN_SECOND),
+            "mean_search_time": sum(all_search_time) / (nb_runs * NANOSECONDS_IN_SECOND),
             "mean_mutation_score": sum(all_mutation_score) / nb_runs,
             "executed_lines_counter": executed_lines_counter,
             "return_code_counter": return_code_counter,
