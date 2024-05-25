@@ -66,10 +66,21 @@ def main() -> None:
 
     n1 = len(first_coverages)
     n2 = len(second_coverages)
-    A = u_statistic / (n1 * n2)
+    a12 = u_statistic / (n1 * n2)
+
+    distance = abs(a12 - 0.5)
+
+    if distance < 0.06:
+        difference = "Negligible"
+    elif distance < 0.14:
+        difference = "Small"
+    elif distance < 0.21:
+        difference = "Medium"
+    else:
+        difference = "Large"
 
     print(f"Mann–Whitney U-test           : {u_statistic} (pvalue: {p_value})")
-    print(f"Vargha-Delaney A statistic    : {A}")
+    print(f"Vargha-Delaney A statistic    : {a12} ({difference})")
 
 
 if __name__ == "__main__":
