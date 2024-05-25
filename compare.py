@@ -48,6 +48,7 @@ def main() -> None:
         "mean_total_time",
         "mean_search_time",
         "mean_mutation_score",
+        "crash_test_count",
         "return_code_counter",
     ]
 
@@ -65,7 +66,7 @@ def main() -> None:
 
     n1 = len(first_coverages)
     n2 = len(second_coverages)
-    A = u_statistic / (n1 * n2) + 0.5
+    A = u_statistic / (n1 * n2)
 
     print(f"Mann–Whitney U-test           : {u_statistic} (pvalue: {p_value})")
     print(f"Vargha-Delaney A statistic    : {A}")
