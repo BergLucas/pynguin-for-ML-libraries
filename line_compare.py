@@ -39,11 +39,11 @@ def main() -> None:
             second_summary["nb_runs"] - second_count
         )
 
-        t_statistic, p_value = mannwhitneyu(
+        u_statistic, p_value = mannwhitneyu(
             first_distribution, second_distribution, alternative="two-sided"
         )
 
-        print(f"Line {line:<4} Mann–Whitney U-test: {t_statistic} (pvalue: {p_value})")
+        print(f"Line {line:<4} Mann–Whitney U-test: {u_statistic} (pvalue: {p_value})")
 
 
 if __name__ == "__main__":

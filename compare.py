@@ -54,16 +54,21 @@ def main() -> None:
     for key in keys:
         first_summary_value = str(first_summary[key])
         second_summary_value = str(second_summary[key])
-        print(f"{key:<25}: {first_summary_value:<35} {second_summary_value:<35}")
+        print(f"{key:<30}: {first_summary_value:<35} {second_summary_value:<35}")
 
     first_coverages = get_coverages(args.first_experiment, first_summary["nb_runs"])
     second_coverages = get_coverages(args.second_experiment, second_summary["nb_runs"])
 
-    t_statistic, p_value = mannwhitneyu(
+    u_statistic, p_value = mannwhitneyu(
         first_coverages, second_coverages, alternative="two-sided"
     )
 
-    print(f"Mann–Whitney U-test      : {t_statistic} (pvalue: {p_value})")
+    n1 = len(first_coverages)
+    n2 = len(second_coverages)
+    A = u_statistic / (n1 * n2) + 0.5
+
+    print(f"Mann–Whitney U-test           : {u_statistic} (pvalue: {p_value})")
+    print(f"Vargha-Delaney A statistic    : {A}")
 
 
 if __name__ == "__main__":
