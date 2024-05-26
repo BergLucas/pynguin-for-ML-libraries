@@ -75,7 +75,12 @@ def run_pynguin(
 
 
 def run_coverage(run_path: str, module_path: str) -> None:
-    (test_file,) = filter(lambda name: name.startswith("test_"), os.listdir(run_path))
+    try:
+        (test_file,) = filter(
+            lambda name: name.startswith("test_"), os.listdir(run_path)
+        )
+    except ValueError:
+        return
 
     subprocess.run(
         [
