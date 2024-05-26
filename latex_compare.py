@@ -1,0 +1,30 @@
+from utils import load_summary, get_coverages, compare_distributions
+from pylatex import NoEscape
+import argparse
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("first_experiment")
+    parser.add_argument("second_experiment")
+
+    args = parser.parse_args()
+
+    first_summary = load_summary(args.first_experiment)
+    second_summary = load_summary(args.second_experiment)
+
+    first_mean_coverage = first_summary["mean_coverage"]
+    second_mean_coverage = second_summary["mean_coverage"]
+
+    first_coverages = get_coverages(args.first_experiment, first_summary["nb_runs"])
+    second_coverages = get_coverages(args.second_experiment, second_summary["nb_runs"])
+
+    _, p_value, a12, difference = compare_distributions(
+        first_coverages, second_coverages
+    )
+
+    print(NoEscape(f"{first_mean_coverage:.2f} & {second_mean_coverage:.2f} & {p_value:.2f} & {difference} ({a12:.2f}) \\\\"))
+
+
+if __name__ == "__main__":
+    main()
