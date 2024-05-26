@@ -33,7 +33,7 @@ def create_table(summaries: list[dict]) -> tuple[tuple, list[tuple]]:
         return_code_counter = summary["return_code_counter"]
         success_count = return_code_counter.pop("0", 0)
         failure_count = return_code_counter.pop("1", 0)
-        timeout_count = return_code_counter.pop("None", 0)
+        timeout_count = return_code_counter.pop("null", 0)
         segmentation_fault_count = return_code_counter.pop("-11", 0)
         out_of_memory_count = return_code_counter.pop("-9", 0)
         floating_point_exception_count = return_code_counter.pop("-8", 0)
