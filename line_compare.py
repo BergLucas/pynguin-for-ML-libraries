@@ -1,5 +1,4 @@
 from utils import load_summary, compare_distributions
-from scipy.stats import mannwhitneyu
 import argparse
 
 
