@@ -36,8 +36,8 @@ def main() -> None:
         first_coverages, second_coverages
     )
 
-    print(f"Mann–Whitney U-test           : {u_statistic} (pvalue: {p_value})")
-    print(f"Vargha-Delaney A statistic    : {a12} ({difference})")
+    print(f"Mann–Whitney U-test           : {u_statistic:.2f} (pvalue: {p_value:.2f})")
+    print(f"Vargha-Delaney A statistic    : {a12:.2f} ({difference:.2f})")
 
 
 if __name__ == "__main__":

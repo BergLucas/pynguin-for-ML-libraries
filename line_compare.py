@@ -36,7 +36,7 @@ def main() -> None:
         )
 
         print(
-            f"Line {line:<4} Mann–Whitney U-test: {u_statistic:.3f} (pvalue: {p_value:.4f}) / Vargha-Delaney A statistic: {a12:.3f} ({difference})"
+            f"Line {line:<4} Mann–Whitney U-test: {u_statistic:.2f} (pvalue: {p_value:.2f}) / Vargha-Delaney A statistic: {a12:.2f} ({difference})"
         )
 
 
