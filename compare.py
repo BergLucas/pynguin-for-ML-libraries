@@ -1,6 +1,6 @@
 from scipy.stats import mannwhitneyu
+from utils import load_summary
 import argparse
-import json
 import csv
 import os
 
@@ -31,14 +31,8 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    first_summary_path = os.path.join(args.first_experiment, "summary.json")
-    second_summary_path = os.path.join(args.second_experiment, "summary.json")
-
-    with open(first_summary_path, "r") as f:
-        first_summary = json.load(f)
-
-    with open(second_summary_path, "r") as f:
-        second_summary = json.load(f)
+    first_summary = load_summary(args.first_experiment)
+    second_summary = load_summary(args.second_experiment)
 
     keys = [
         "experiment_name",

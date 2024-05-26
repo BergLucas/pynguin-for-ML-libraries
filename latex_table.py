@@ -1,14 +1,6 @@
+from utils import load_summary
 from pylatex import Tabular
 import argparse
-import json
-import os
-
-
-def load_summary(experiment_path: str) -> dict:
-    summary_path = os.path.join(experiment_path, "summary.json")
-
-    with open(summary_path, "r") as f:
-        return json.load(f)
 
 
 def create_table(summaries: list[dict]) -> tuple[tuple, list[tuple]]:

@@ -1,17 +1,12 @@
 import matplotlib.pyplot as plt
+from utils import load_summary
 from functools import reduce
 import operator
 import argparse
-import json
-import os
 
 
 def load_experiment(experiment_path: str) -> tuple[str, int, dict]:
-    summary_path = os.path.join(experiment_path, "summary.json")
-
-    with open(summary_path, "r") as f:
-        summary = json.load(f)
-
+    summary = load_summary(experiment_path)
     return (
         summary["experiment_name"],
         summary["nb_runs"],

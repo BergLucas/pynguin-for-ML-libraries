@@ -1,15 +1,7 @@
 from matplotlib_venn import venn2_unweighted
+from utils import load_summary
 import matplotlib.pyplot as plt
 import argparse
-import json
-import os
-
-
-def load_summary(experiment_path: str) -> dict:
-    summary_path = os.path.join(experiment_path, "summary.json")
-
-    with open(summary_path, "r") as f:
-        return json.load(f)
 
 
 def executed_lines_set(executed_lines_counter: dict[str, int]) -> set[str]:
