@@ -1,5 +1,5 @@
+from utils import load_summary, compare_distributions
 from scipy.stats import mannwhitneyu
-from utils import load_summary
 import argparse
 
 
@@ -32,11 +32,13 @@ def main() -> None:
             second_summary["nb_runs"] - second_count
         )
 
-        u_statistic, p_value = mannwhitneyu(
-            first_distribution, second_distribution, alternative="two-sided"
+        u_statistic, p_value, a12, difference = compare_distributions(
+            first_distribution, second_distribution
         )
 
-        print(f"Line {line:<4} Mann–Whitney U-test: {u_statistic} (pvalue: {p_value})")
+        print(
+            f"Line {line:<4} Mann–Whitney U-test: {u_statistic:.3f} (pvalue: {p_value:.4f}) / Vargha-Delaney A statistic: {a12:.3f} ({difference})"
+        )
 
 
 if __name__ == "__main__":
