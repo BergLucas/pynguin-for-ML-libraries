@@ -26,7 +26,7 @@ You can setup a Python development environment by running the following commands
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install PyLaTeX==1.4.2 scipy==1.13.0 coverage==7.5.1 -e ./pynguin
+pip install matplotlib==3.8.4 matplotlib-venn==0.11.10 PyLaTeX==1.4.2 scipy==1.13.0 coverage==7.5.1 -e ./pynguin
 ```
 
 ## Setting up a Conda development environment
