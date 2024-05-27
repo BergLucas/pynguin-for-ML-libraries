@@ -62,7 +62,10 @@ def main() -> None:
 
     data = create_table(list(map(load_summary, args.experiments)))
 
-    except_column_names = args.except_column.split(",")
+    if args.except_column is not None:
+        except_column_names = args.except_column.split(",")
+    else:
+        except_column_names = []
 
     column_indexes = tuple(
         i for i in range(len(HEADER)) if HEADER[i] not in except_column_names
