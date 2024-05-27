@@ -37,7 +37,7 @@ def main() -> None:
     )
 
     print(f"Mann–Whitney U-test           : {u_statistic:.2f} (pvalue: {p_value:.2f})")
-    print(f"Vargha-Delaney A statistic    : {a12:.2f} ({difference:.2f})")
+    print(f"Vargha-Delaney A statistic    : {difference} ({a12:.2f})")
 
 
 if __name__ == "__main__":
