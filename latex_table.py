@@ -10,6 +10,7 @@ HEADER = (
     "Total time",
     "Search time",
     "Mutation score",
+    "Crash test count",
     "Success",
     "Failure",
     "Timeout",
@@ -40,6 +41,7 @@ def create_table(summaries: list[dict]) -> list[tuple]:
                 f'{summary["mean_total_time"]:.2f}',
                 f'{summary["mean_search_time"]:.2f}',
                 f'{summary["mean_mutation_score"]:.2f}',
+                str(summary["crash_test_count"]),
                 str(success_count),
                 str(failure_count),
                 str(timeout_count),
@@ -55,20 +57,20 @@ def create_table(summaries: list[dict]) -> list[tuple]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--except_column")
+    parser.add_argument("--except_columns")
     parser.add_argument("experiments", nargs="+")
 
     args = parser.parse_args()
 
     data = create_table(list(map(load_summary, args.experiments)))
 
-    if args.except_column is not None:
-        except_column_names = args.except_column.split(",")
+    if args.except_columns is not None:
+        except_columns_names = args.except_columns.split(",")
     else:
-        except_column_names = []
+        except_columns_names = []
 
     column_indexes = tuple(
-        i for i in range(len(HEADER)) if HEADER[i] not in except_column_names
+        i for i in range(len(HEADER)) if HEADER[i] not in except_columns_names
     )
 
     header = tuple(HEADER[i] for i in column_indexes)
