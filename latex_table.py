@@ -3,23 +3,24 @@ from pylatex import Tabular
 import argparse
 
 
-def create_table(summaries: list[dict]) -> tuple[tuple, list[tuple]]:
-    header = (
-        "Experiment",
-        "Coverage",
-        "Iterations",
-        "Total time",
-        "Search time",
-        "Mutation score",
-        "Success",
-        "Failure",
-        "Timeout",
-        "Segmentation fault",
-        "Out of memory",
-        "Floating point exception",
-        "Other crashes",
-    )
+HEADER = (
+    "Experiment",
+    "Coverage",
+    "Iterations",
+    "Total time",
+    "Search time",
+    "Mutation score",
+    "Success",
+    "Failure",
+    "Timeout",
+    "Segmentation fault",
+    "Out of memory",
+    "Floating point exception",
+    "Other crashes",
+)
 
+
+def create_table(summaries: list[dict]) -> list[tuple]:
     data: list[tuple] = []
     for summary in summaries:
         return_code_counter = summary["return_code_counter"]
@@ -49,23 +50,32 @@ def create_table(summaries: list[dict]) -> tuple[tuple, list[tuple]]:
             )
         )
 
-    return header, data
+    return data
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--except_column")
     parser.add_argument("experiments", nargs="+")
 
     args = parser.parse_args()
 
-    header, data = create_table(list(map(load_summary, args.experiments)))
+    data = create_table(list(map(load_summary, args.experiments)))
+
+    except_column_names = args.except_column.split(",")
+
+    column_indexes = tuple(
+        i for i in range(len(HEADER)) if HEADER[i] not in except_column_names
+    )
+
+    header = tuple(HEADER[i] for i in column_indexes)
 
     latex_table = Tabular(f'|{" c |" * len(header)}')
     latex_table.add_hline()
     latex_table.add_row(header)
     latex_table.add_hline()
     for row in data:
-        latex_table.add_row(row)
+        latex_table.add_row(tuple(row[i] for i in column_indexes))
         latex_table.add_hline()
 
     print(latex_table.dumps())
