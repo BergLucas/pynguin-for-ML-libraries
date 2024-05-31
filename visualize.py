@@ -16,6 +16,7 @@ def load_experiment(experiment_path: str) -> tuple[str, int, dict]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--no-interactive", action="store_true")
     parser.add_argument("experiments", nargs="+")
 
     args = parser.parse_args()
@@ -37,33 +38,46 @@ def main() -> None:
         key=lambda line: int(line),
     )
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(5, max(10, len(lines) // 50)))
 
-    bottom = [0] * len(lines)
+    left = [0] * len(lines)
     for experiment_name, executed_lines_counter in zip(
         all_experiment_name, all_executed_lines_counter
     ):
-        sorted_executed_lines_counter = [executed_lines_counter[line] for line in lines]
-        ax.bar(
+        sorted_line_hit_frequencies = [
+            executed_lines_counter[line] / total_nb_runs for line in lines
+        ]
+        ax.barh(
             lines,
-            sorted_executed_lines_counter,
+            sorted_line_hit_frequencies,
             label=experiment_name,
-            bottom=bottom,
+            left=left,
         )
-        bottom = [sum(x) for x in zip(bottom, sorted_executed_lines_counter)]
+        left = [sum(x) for x in zip(left, sorted_line_hit_frequencies)]
 
-    ax.set_ylim([0, total_nb_runs * 1.1])
-    ax.set_xlabel("Line number")
-    ax.set_ylabel(f"Number of times the line was executed by a test suite")
+    ax.set_ylabel("Line number")
+    ax.set_xlabel("Line hit frequency")
+    ax.set_ylim((len(lines) * len(all_experiment_name)) / -20, len(lines) + 5)
+    ax.invert_yaxis()
 
     experiment_names = " and ".join(all_experiment_name)
 
-    fig.canvas.manager.set_window_title(f"Visualization of {experiment_names}")
+    title = f"Line hit frequency of {experiment_names}"
 
-    plt.xticks(rotation=90, fontsize=6)
-    plt.legend()
+    fig.canvas.manager.set_window_title(title)
 
-    plt.show()
+    plt.xticks([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+    plt.yticks(range(0, len(lines), len(lines) // 25))
+    plt.legend(loc="upper right")
+
+    if args.no_interactive:
+        plt.savefig(
+            title.replace(" ", "_") + ".png",
+            dpi=300,
+            bbox_inches="tight",
+        )
+    else:
+        plt.show()
 
 
 if __name__ == "__main__":
