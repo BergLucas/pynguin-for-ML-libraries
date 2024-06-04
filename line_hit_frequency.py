@@ -38,7 +38,7 @@ def main() -> None:
         key=lambda line: int(line),
     )
 
-    fig, ax = plt.subplots(figsize=(5, max(10, len(lines) // 50)))
+    fig, ax = plt.subplots(figsize=(5, 10))
 
     left = [0] * len(lines)
     for experiment_name, executed_lines_counter in zip(
