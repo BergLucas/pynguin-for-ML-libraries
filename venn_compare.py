@@ -10,6 +10,7 @@ def executed_lines_set(executed_lines_counter: dict[str, int]) -> set[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--no-interactive", action="store_true")
     parser.add_argument("first_experiment")
     parser.add_argument("second_experiment")
 
@@ -34,9 +35,18 @@ def main() -> None:
         ax=ax,
     )
 
-    fig.canvas.manager.set_window_title(f"Comparison of {experiment_names}")
+    title = f"Comparison of {experiment_names}"
 
-    plt.show()
+    fig.canvas.manager.set_window_title(title)
+
+    if args.no_interactive:
+        plt.savefig(
+            title.replace(" ", "_") + ".png",
+            dpi=300,
+            bbox_inches="tight",
+        )
+    else:
+        plt.show()
 
 
 if __name__ == "__main__":
